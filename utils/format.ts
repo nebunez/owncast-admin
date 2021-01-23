@@ -14,15 +14,15 @@ export function formatIPAddress(ipAddress: string): string {
 }
 
 // check if obj is {}
-export function isEmptyObject(obj) {
+export function isEmptyObject(obj: any): boolean {
   return !obj || (Object.keys(obj).length === 0 && obj.constructor === Object);
 }
 
-export function padLeft(text, pad, size) {
+export function padLeft(text: string, pad: string, size: number): string {
   return String(pad.repeat(size) + text).slice(-size);
 }
 
-export function parseSecondsToDurationString(seconds = 0) {
+export function parseSecondsToDurationString(seconds = 0): string {
   const finiteSeconds = Number.isFinite(+seconds) ? Math.abs(seconds) : 0;
 
   const days = Math.floor(finiteSeconds / 86400);

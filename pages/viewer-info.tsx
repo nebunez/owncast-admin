@@ -3,7 +3,8 @@ import { Table, Row } from "antd";
 import { formatDistanceToNow } from "date-fns";
 import { UserOutlined} from "@ant-design/icons";
 import { SortOrder } from "antd/lib/table/interface";
-import Chart from "./components/chart";
+import { ColumnsType } from "antd/es/table";
+import Chart, { TimedValue } from "./components/chart";
 import StatisticItem from "./components/statistic";
 
 import { ServerStatusContext } from '../utils/server-status-context';
@@ -16,6 +17,22 @@ import {
 
 const FETCH_INTERVAL = 60 * 1000; // 1 min
 
+interface Geo {
+    countryCode: string,
+    regionName: string,
+    timeZone: string
+}
+
+interface Client {
+  connectedAt: Date,
+    messageCount: 0,
+    userAgent: string,
+    ipAddress: string,
+    username: string,
+    clientID: string,
+    geo: Geo
+}
+
 export default function ViewersOverTime() {
   const context = useContext(ServerStatusContext);
   const {
@@ -25,19 +42,19 @@ export default function ViewersOverTime() {
     sessionPeakViewerCount,
   } = context || {};
 
-  const [viewerInfo, setViewerInfo] = useState([]);
-  const [clients, setClients] = useState([]);
+  const [viewerInfo, setViewerInfo] = useState([] as TimedValue[]);
+  const [clients, setClients] = useState([] as Client[]);
 
   const getInfo = async () => {
     try {
-      const result = await fetchData(VIEWERS_OVER_TIME);
+      const result: TimedValue[] = await fetchData(VIEWERS_OVER_TIME);
       setViewerInfo(result);
     } catch (error) {
       console.log("==== error", error);
     }
 
     try {
-      const result = await fetchData(CONNECTED_CLIENTS);
+      const result: Client[] = await fetchData(CONNECTED_CLIENTS);
       setClients(result);
     } catch (error) {
       console.log("==== error", error);
@@ -45,7 +62,7 @@ export default function ViewersOverTime() {
   };
 
   useEffect(() => {
-    let getStatusIntervalId = null;
+    let getStatusIntervalId: NodeJS.Timeout = null;
 
     getInfo();
     if (online) {
@@ -65,13 +82,13 @@ export default function ViewersOverTime() {
     return "no info";
   }
 
-  const columns = [
+  const columns: ColumnsType<Client> = [
     {
       title: "User name",
       dataIndex: "username",
       key: "username",
       render: (username) => username || "-",
-      sorter: (a, b) => a.username - b.username,
+      sorter: (a, b) => a.username.localeCompare(b.username),
       sortDirections: ["descend", "ascend"] as SortOrder[],
     },
     {

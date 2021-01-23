@@ -2,6 +2,16 @@ import { Table, Typography } from "antd";
 
 const { Title } = Typography;
 
+export interface KeyValueTableData {
+  name: string;
+  value: string | number;
+}
+
+interface KeyValueTableProps {
+  title: string, 
+  data: KeyValueTableData[],
+};
+
 export default function KeyValueTable({ title, data }: KeyValueTableProps) {
   const columns = [
     {
@@ -23,8 +33,3 @@ export default function KeyValueTable({ title, data }: KeyValueTableProps) {
     </>
   );
 }
-
-interface KeyValueTableProps {
-  title: string, 
-  data: any,
-};

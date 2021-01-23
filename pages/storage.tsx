@@ -1,12 +1,16 @@
 import React, { useContext } from "react";
-import KeyValueTable from "./components/key-value-table";
-import { ServerStatusContext } from '../utils/server-status-context';
 import { Typography } from 'antd';
 import Link from 'next/link';
+import KeyValueTable, { KeyValueTableData } from "./components/key-value-table";
+import { ServerConfigState, ServerStatusContext } from '../utils/server-status-context';
 
 const { Title } = Typography;
 
-function Storage({ config }) {
+interface StorageProps {
+  config: ServerConfigState;
+}
+
+function Storage({ config }: StorageProps) {
   if (!config || !config.s3) {
     return null;
   }
@@ -29,7 +33,7 @@ function Storage({ config }) {
     );
   }
 
-  const data = [
+  const data: KeyValueTableData[] = [
     {
       name: "Enabled",
       value: config.s3.enabled.toString(),

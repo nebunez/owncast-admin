@@ -3,11 +3,115 @@ import PropTypes from 'prop-types';
 
 import { STATUS, fetchData, FETCH_INTERVAL, SERVER_CONFIG } from './apis';
 
-export const initialServerConfigState = {
+export interface StreamDetails {
+  videoCodec: string;
+  videoBitrate: number;
+  audioCodec: String;
+  audioBitrate: number;
+  encoder: string;
+  framerate: number;
+  width: number;
+  height: number;
+}
+
+interface Broadcaster {
+  remoteAddr: string;
+  time: string;
+  streamDetails: StreamDetails;
+}
+
+export interface SocialHandle {
+  platform: string;
+  url: string;
+}
+
+interface InstanceDetails {
+  name: string;
+  title: string;
+  summary: string;
+  logo: string;
+  tags?: string[];
+  version: string;
+  nsfw: boolean;
+  socialHandles?: SocialHandle[];
+  extraPageContent?: string;
+}
+
+interface S3 {
+  enabled: boolean;
+  endpoint?: string;
+  servingEndpoint?: string;
+  accessKey?: string;
+  secret?: string;
+  bucket?: string;
+  region?: string;
+  acl?: string;
+}
+
+export interface VideoQualityVariant {
+  audioPassthrough: boolean;
+  videoPassthrough: boolean;
+  videoBitrate: number;
+  audioBitrate: number;
+  framerate: number;
+  encoderPreset: string;
+}
+
+export interface VideoSettings {
+  videoQualityVariants: VideoQualityVariant[];
+  segmentLengthSeconds: number;
+  numberOfPlaylistItems: number;
+}
+
+interface YP {
+  enabled: boolean;
+  instanceURL?: string;
+}
+
+export interface ServerConfigState {
+  instanceDetails: InstanceDetails;
+  ffmpegPath: string;
+  streamKey: string;
+  webServerPort: number;
+  rtmpServerPort: number;
+  s3: S3;
+  videoSettings: VideoSettings;
+  yp: YP;
+}
+
+interface ServerStatusState {
+  broadcastActive: boolean;
+  broadcaster: Broadcaster;
+  online: boolean;
+  viewerCount: number;
+  sessionMaxViewerCount: number;
+  sessionPeakViewerCount: number;
+  overallPeakViewerCount: number;
+  disableUpgradeChecks: boolean;
+  versionNumber: string;
+}
+
+interface ServerStatus extends ServerStatusState {
+  serverConfig: ServerConfigState;
+}
+
+const initialServerConfigState: ServerConfigState = {
+  instanceDetails: {
+    name: "",
+    title: "",
+    summary: "",
+    logo: "",
+    version: "",
+    nsfw: false
+  },
+  ffmpegPath: "",
   streamKey: '',
+  webServerPort: 0,
+  rtmpServerPort: 0,
   yp: {
     enabled: false,
   },
+  s3: { enabled: false },
   videoSettings: {
     videoQualityVariants: [
       {
@@ -16,12 +120,15 @@ export const initialServerConfigState = {
         videoBitrate: 0,
         audioBitrate: 0,
         framerate: 0,
-      },
+        encoderPreset: ""
+      }
     ],
+    segmentLengthSeconds: 0,
+    numberOfPlaylistItems: 0
   }
 };
 
-const initialServerStatusState = {
+const initialServerStatusState: ServerStatusState = {
   broadcastActive: false,
   broadcaster: null,
   online: false,
@@ -33,10 +140,12 @@ const initialServerStatusState = {
   versionNumber: '0.0.0',
 };
 
-export const ServerStatusContext = React.createContext({
-  ...initialServerStatusState,
+const initialServerStatusContext: ServerStatus = {
   serverConfig: initialServerConfigState,
-});
+  ...initialServerStatusState,
+}
+
+export const ServerStatusContext = React.createContext(initialServerStatusContext);
 
 const ServerStatusProvider = ({ children }) => {
   const [status, setStatus] = useState(initialServerStatusState);
@@ -60,16 +169,16 @@ const ServerStatusProvider = ({ children }) => {
     }
   };
 
-  
+
   useEffect(() => {
-    let getStatusIntervalId = null;
+    let getStatusIntervalId: NodeJS.Timeout = null;
 
     getStatus();
     getStatusIntervalId = setInterval(getStatus, FETCH_INTERVAL);
 
     getConfig();
 
-    // returned function will be called on component unmount 
+    // returned function will be called on component unmount
     return () => {
       clearInterval(getStatusIntervalId);
     }
@@ -78,7 +187,7 @@ const ServerStatusProvider = ({ children }) => {
   const providerValue = {
       ...status,
       serverConfig: config,
-  };
+  } as ServerStatus;
   return (
     <ServerStatusContext.Provider value={providerValue}>
       {children}

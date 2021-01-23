@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { Table, Typography } from "antd";
+import { ColumnsType } from 'antd/es/table';
 import { getGithubRelease } from "../utils/apis";
 
 const { Title } = Typography;
 
-function AssetTable(assets) {
-  const data = Object.values(assets) as object[];
+interface Asset {
+  /* eslint-disable camelcase */
+  name: string;
+  size: string;
+  browser_download_url: string;
+  /* eslint-enable camelcase */
+}
 
-  const columns = [
+interface AssetTableProps {
+  assets: Asset[];
+}
+
+function AssetTable({assets}: AssetTableProps) {
+  const columns: ColumnsType<Asset> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -24,19 +35,29 @@ function AssetTable(assets) {
     },
   ];
 
-  return <Table dataSource={data} columns={columns} rowKey="id" size="large" pagination={false} />
+  return <Table dataSource={assets} columns={columns} rowKey="id" size="large" pagination={false} />
 }
 
+interface Release {
+  /* eslint-disable camelcase */
+  html_url: string;
+  name: string;
+  created_at: Date;
+  body: string;
+  assets: Asset[];
+  /* eslint-enable camelcase */
+}
 
-export default function Logs() {
-  const [release, setRelease] = useState({
-    html_url: "",
-    name: "",
-    created_at: null,
-    body: "",
-    assets: [],
+const initialRelease: Release = {
+  html_url: "",
+  name: "",
+  created_at: null,
+  body: "",
+  assets: [],
+}
 
-  });
+export default function Upgrade() {
+  const [release, setRelease] = useState(initialRelease);
 
   const getRelease = async () => {
     try {
@@ -62,7 +83,7 @@ export default function Logs() {
       </Title>
       <Title level={5}>{new Date(release.created_at).toDateString()}</Title>
       <ReactMarkdown>{release.body}</ReactMarkdown><h3>Downloads</h3>
-      <AssetTable {...release.assets} />
+      <AssetTable assets={release.assets} />
     </div>
   );
 }

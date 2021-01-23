@@ -37,24 +37,38 @@ export const LOGS_WARN = `${API_LOCATION}logs/warnings`;
 // Get chat history
 export const CHAT_HISTORY = `${API_LOCATION}chat/messages`;
 
-// Get chat history
+// Update chat visibility
+export interface ChatMessageVizData {
+  visible: boolean;
+  idArray: string[];
+}
+export interface ChatMessageVizResponse {
+  message: string;
+  success: boolean;
+}
 export const UPDATE_CHAT_MESSGAE_VIZ = `${NEXT_PUBLIC_API_HOST}api/admin/chat/updatemessagevisibility`;
 
 
 const GITHUB_RELEASE_URL = "https://api.github.com/repos/owncast/owncast/releases/latest";
 
+export interface PostData {
+  auth: boolean;
+  method: string;
+  data: ChatMessageVizData;
+}
+
 interface FetchOptions {
-  data?: any;
+  data?: object;
   method?: string;
   auth?: boolean;
-};
+}
 
 export async function fetchData(url: string, options?: FetchOptions) {
   const {
     data,
     method = 'GET',
     auth = true,
-  } = options || {};
+  } = options || {} as FetchOptions;
 
   const requestOptions: RequestInit = {
     method,
@@ -82,7 +96,7 @@ export async function fetchData(url: string, options?: FetchOptions) {
     const json = await response.json();
     return json;
   } catch (error) {
-    console.log(error)
+    console.error(error);
   }
   return {};
 }
@@ -104,9 +118,9 @@ export async function getGithubRelease() {
 
 // Make a request to the server status API and the Github releases API
 // and return a release if it's newer than the server version.
-export async function upgradeVersionAvailable(currentVersion) {
+export async function upgradeVersionAvailable(currentVersion: string) {
   const recentRelease = await getGithubRelease();
-  let recentReleaseVersion = recentRelease.tag_name;
+  let recentReleaseVersion: string = recentRelease.tag_name;
 
   if (recentReleaseVersion.substr(0, 1) === 'v') {
     recentReleaseVersion = recentReleaseVersion.substr(1)
@@ -121,7 +135,7 @@ export async function upgradeVersionAvailable(currentVersion) {
 
 // Stolen from https://gist.github.com/prenagha/98bbb03e27163bc2f5e4
 const VPAT = /^\d+(\.\d+){0,2}$/;
-function upToDate(local, remote) {
+function upToDate(local: string, remote: string) {
     if (!local || !remote || local.length === 0 || remote.length === 0)
         return false;
     if (local === remote)
@@ -143,7 +157,6 @@ function upToDate(local, remote) {
             return l > r;
         }
         return true;
-    } 
+    }
         return local >= remote;
-    
 }

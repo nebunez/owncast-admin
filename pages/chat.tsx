@@ -3,52 +3,77 @@ import { Table, Typography, Tooltip, Button } from "antd";
 import { CheckCircleFilled, ExclamationCircleFilled } from "@ant-design/icons";
 import classNames from 'classnames';
 import { ColumnsType } from 'antd/es/table';
+import { ColumnFilterItem } from 'antd/es/table/interface';
 import format from 'date-fns/format'
 
-import { CHAT_HISTORY, fetchData, FETCH_INTERVAL, UPDATE_CHAT_MESSGAE_VIZ } from "../utils/apis";
-import { MessageType } from '../types/chat';
+import {
+  ChatMessageVizData,
+  ChatMessageVizResponse,
+  PostData,
+  CHAT_HISTORY,
+  FETCH_INTERVAL,
+  UPDATE_CHAT_MESSGAE_VIZ,
+  fetchData,
+} from "../utils/apis";
 import { isEmptyObject } from "../utils/format";
 import MessageVisiblityToggle from "./components/message-visiblity-toggle";
 
 const { Title } = Typography;
 
-function createUserNameFilters(messages: MessageType[]) {
-  const filtered = messages.reduce((acc, curItem) => {
+export interface Message {
+  author: string;
+  body: string;
+  id: string;
+  key: string;
+  name: string;
+  timestamp: string;
+  type: string;
+  visible: boolean;
+}
+
+function createUserNameFilters(messages: Message[]) {
+  const filtered: ColumnFilterItem[] = messages.reduce((acc, curItem) => {
     const curAuthor = curItem.author;
     if (!acc.some(item => item.text === curAuthor)) {
       acc.push({ text: curAuthor, value: curAuthor });
     }
     return acc;
-  }, []);
+  }, [] as ColumnFilterItem[]);
 
-  // sort by name
+  // sort by value
   return filtered.sort((a, b) => {
-    const nameA = a.text.toUpperCase(); // ignore upper and lowercase
-    const nameB = b.text.toUpperCase(); // ignore upper and lowercase
-    if (nameA < nameB) {
+    // ignore upper and lowercase if our values are of type 'string'
+    const valueA = (typeof a.value === 'string')
+      ? a.value.toUpperCase()
+      : a.value;
+    const valueB = (typeof b.value === 'string')
+      ? b.value.toUpperCase()
+      : b.value;
+
+    if (valueA < valueB) {
       return -1;
     }
-    if (nameA > nameB) {
+    if (valueA > valueB) {
       return 1;
     }
-    // names must be equal
+    // values must be equal
     return 0;
   });
 }
 export const OUTCOME_TIMEOUT = 3000;
 
 export default function Chat() {
-  const [messages, setMessages] = useState([]);
-  const [selectedRowKeys, setSelectedRows] = useState([]);
+  const [messages, setMessages] = useState([] as Message[]);
+  const [selectedRowKeys, setSelectedRows] = useState([] as string[]);
   const [bulkProcessing, setBulkProcessing] = useState(false);
-  const [bulkOutcome, setBulkOutcome] = useState(null);
+  const [bulkOutcome, setBulkOutcome] = useState(null as React.ReactNode);
   const [bulkAction, setBulkAction] = useState('');
-  let outcomeTimeout = null;
-  let chatReloadInterval = null;
+  let outcomeTimeout = null as NodeJS.Timeout;
+  let chatReloadInterval = null as NodeJS.Timeout;
 
   const getInfo = async () => {
     try {
-      const result = await fetchData(CHAT_HISTORY, { auth: true });
+      const result: Message[] = await fetchData(CHAT_HISTORY, { auth: true });
       if (isEmptyObject(result)) {
         setMessages([]);
       } else {
@@ -73,7 +98,7 @@ export default function Chat() {
   }, []);
 
   const nameFilters = createUserNameFilters(messages);
-  
+
   const rowSelection = {
     selectedRowKeys,
     onChange: (selectedKeys: string[]) => {
@@ -93,16 +118,18 @@ export default function Chat() {
       setBulkAction('');
     }, OUTCOME_TIMEOUT);
   };
-  const handleSubmitBulk = async (bulkVisibility) => {
+  const handleSubmitBulk = async (bulkVisibility: boolean) => {
     setBulkProcessing(true);
-    const result = await fetchData(UPDATE_CHAT_MESSGAE_VIZ, {
+
+    const postData: PostData = {
       auth: true,
       method: 'POST',
       data: {
         visible: bulkVisibility,
         idArray: selectedRowKeys,
-      },
-    });
+      }
+    }
+    const result: ChatMessageVizResponse = await fetchData(UPDATE_CHAT_MESSGAE_VIZ, postData);
 
     if (result.success && result.message === "changed") {
       setBulkOutcome(<CheckCircleFilled />);
@@ -112,7 +139,7 @@ export default function Chat() {
       const updatedList = [...messages];
       selectedRowKeys.map(key => {
         const messageIndex = updatedList.findIndex(m => m.id === key);
-        const newMessage = {...messages[messageIndex], visible: bulkVisibility };
+        const newMessage: Message = {...messages[messageIndex], visible: bulkVisibility };
         updatedList.splice(messageIndex, 1, newMessage);
         return null;
       });
@@ -133,7 +160,7 @@ export default function Chat() {
     handleSubmitBulk(false);
   }
 
-  const chatColumns: ColumnsType<MessageType> = [
+  const chatColumns: ColumnsType<Message> = [
     {
       title: 'Time',
       dataIndex: 'timestamp',
@@ -155,7 +182,7 @@ export default function Chat() {
       filters: nameFilters,
       onFilter: (value, record) => record.author === value,
       sorter: (a, b) => a.author.localeCompare(b.author),
-      sortDirections: ['ascend', 'descend'],  
+      sortDirections: ['ascend', 'descend'],
       ellipsis: true,
       render: author => (
         <Tooltip placement="topLeft" title={author}>
@@ -200,7 +227,10 @@ export default function Chat() {
     'bulk-editor': true,
     active: selectedRowKeys.length,
   });
-  
+
+  /** TODO: Find documentation for the error below,
+   * and document here with an eslint-disable comment
+  */
   return (
     <div className="chat-messages">
       <Title level={2}>Chat Messages</Title>
@@ -236,14 +266,13 @@ export default function Chat() {
       <Table
         size="small"
         className="messages-table"
-        pagination={{ pageSize: 100 }} 
+        pagination={{ pageSize: 100 }}
         scroll={{ y: 540 }}
-        rowClassName={record => !record.visible ? 'hidden' : ''}
+        rowClassName={(record: ChatMessageVizData) => !record.visible ? 'hidden' : ''}
         dataSource={messages}
         columns={chatColumns}
-        rowKey={(row) => row.id}
+        rowKey={(record: Message) => record.id}
         rowSelection={rowSelection}
       />
   </div>)
 }
-

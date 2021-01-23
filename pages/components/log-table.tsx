@@ -1,12 +1,14 @@
 import React from "react";
 import { Table, Tag, Typography } from "antd";
+import { ColumnsType } from "antd/es/table";
 import Linkify from "react-linkify";
 import { SortOrder } from "antd/lib/table/interface";
 import format from 'date-fns/format'
+import { Log } from '../logs';
 
 const { Title } = Typography;
 
-function renderColumnLevel(text, entry) {
+function renderColumnLevel(text: string, entry: Log) {
   let color = 'black';
 
   if (entry.level === "warning") {
@@ -18,22 +20,22 @@ function renderColumnLevel(text, entry) {
   return <Tag color={color}>{text}</Tag>;
 }
 
-function renderMessage(text) {
+function renderMessage(text: string) {
   return (
     <Linkify>{text}</Linkify>
   )
 }
 
-interface Props {
-  logs: object[],
+interface LogTableProps {
+  logs: Log[],
   pageSize: number
 }
 
-export default function LogTable({ logs, pageSize }: Props) {
-  if (!logs?.length) {
+export default function LogTable({ logs, pageSize }: LogTableProps) {
+  if (!logs.length) {
     return null;
   }
-  const columns = [
+  const columns: ColumnsType<Log> = [
     {
       title: "Level",
       dataIndex: "level",
@@ -52,7 +54,7 @@ export default function LogTable({ logs, pageSize }: Props) {
           value: "Error",
         },
       ],
-      onFilter: (level, row) => row.level.indexOf(level) === 0,
+      onFilter: (level, row) => level === row.level,
       render: renderColumnLevel,
     },
     {
@@ -88,4 +90,3 @@ export default function LogTable({ logs, pageSize }: Props) {
     </div>
   );
 }
-

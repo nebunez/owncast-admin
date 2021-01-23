@@ -8,12 +8,18 @@ import {
 
 const FETCH_INTERVAL = 5 * 1000; // 5 sec
 
+export interface Log {
+  message: string;
+  level: string;
+  time: string;
+}
+
 export default function Logs() {
-  const [logs, setLogs] = useState([]);
+  const [logs, setLogs] = useState([] as Log[]);
 
   const getInfo = async () => {
     try {
-      const result = await fetchData(LOGS_ALL);
+      const result: Log[] = await fetchData(LOGS_ALL);
       setLogs(result);
     } catch (error) {
       console.log("==== error", error);
@@ -21,7 +27,7 @@ export default function Logs() {
   };
 
   useEffect(() => {
-    let getStatusIntervalId = null;
+    let getStatusIntervalId: NodeJS.Timeout = null;
 
     setInterval(getInfo, FETCH_INTERVAL);
     getInfo();

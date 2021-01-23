@@ -2,9 +2,7 @@ import { Button, Card, Col, Divider, Result, Row } from 'antd'
 import Meta from 'antd/lib/card/Meta'
 import Title from 'antd/lib/typography/Title'
 import {
-    AlertOutlined,
     ApiTwoTone,
-    BookOutlined,
     BugTwoTone,
     CameraTwoTone,
     DatabaseTwoTone,
@@ -17,10 +15,14 @@ import {
 } from '@ant-design/icons'
 import React from 'react'
 
-interface Props { }
+interface HelpCardData {
+  icon: JSX.Element;
+  title: string;
+  content: JSX.Element;
+}
 
-export default function Help(props: Props) {
-    const questions = [
+export default function Help() {
+    const questions: HelpCardData[] = [
         {
             icon: <SettingTwoTone style={{ fontSize: '24px' }} />,
             title: "I want to configure my owncast instance",
@@ -77,7 +79,7 @@ export default function Help(props: Props) {
         },
     ]
 
-    const otherResources = [
+    const otherResources: HelpCardData[] = [
         {
             icon: <BugTwoTone style={{ fontSize: '24px' }}  />,
             title: "I found a bug",

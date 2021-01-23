@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import Link from 'next/link';
 import Head from 'next/head'
 import { differenceInSeconds } from "date-fns";
@@ -27,7 +26,11 @@ import adminStyles from '../../styles/styles.module.scss';
 
 let performedUpgradeCheck = false;
 
-export default function MainLayout(props) {
+interface MainLayoutProps {
+  children: JSX.Element;
+}
+
+export default function MainLayout(props: MainLayoutProps) {
   const { children } = props;
 
   const context = useContext(ServerStatusContext);
@@ -43,13 +46,13 @@ export default function MainLayout(props) {
 
   const content = (
     <div>
-     <img src="/thumbnail.jpg" width="200px" />
+     <img src="/thumbnail.jpg" alt="" width="200px" />
     </div>
   );
   const statusIcon = online ? <PlayCircleFilled /> : <MinusSquareFilled />;
   const statusMessage = online ? `Online ${streamDurationString}` : "Offline";
 
-  const [upgradeVersion, setUpgradeVersion] = useState(null);
+  const [upgradeVersion, setUpgradeVersion] = useState('');
   const checkForUpgrade = async () => {
     try {
       const result = await upgradeVersionAvailable(versionNumber);
@@ -72,8 +75,11 @@ export default function MainLayout(props) {
   });
 
   const upgradeMenuItemStyle = upgradeVersion ? 'block' : 'none';
-  const upgradeVersionString = upgradeVersion || '';
 
+  /* eslint-disable jsx-a11y/anchor-is-valid */
+  /** the 'next/link' API conflicts with this rule
+   * https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/issues/402
+  */
   return (
     <Layout className={appClass}>
       <Head>
@@ -146,7 +152,7 @@ export default function MainLayout(props) {
             </Menu.Item>
             <Menu.Item key="upgrade" style={{ display: upgradeMenuItemStyle }}>
               <Link href="/upgrade">
-                <a>Upgrade to v{upgradeVersionString}</a>
+                <a>Upgrade to v{upgradeVersion}</a>
               </Link>
             </Menu.Item>
           </SubMenu>
@@ -178,7 +184,3 @@ export default function MainLayout(props) {
     </Layout>
   );
 }
-
-MainLayout.propTypes = {
-  children: PropTypes.element.isRequired,
-};

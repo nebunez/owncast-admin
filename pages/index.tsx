@@ -8,13 +8,14 @@ TODO: Link each overview value to the sub-page that focuses on it.
 */
 
 import React, { useState, useEffect, useContext } from "react";
-import { Skeleton, Card, Statistic } from "antd";
+import { List, Skeleton, Card, Statistic } from "antd";
 import { UserOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { formatDistanceToNow, formatRelative } from "date-fns";
 import { ServerStatusContext } from "../utils/server-status-context";
 import StatisticItem from "./components/statistic"
 import LogTable from "./components/log-table";
 import Offline from './offline-notice';
+import { Log } from './logs';
 
 import {
   LOGS_WARN,
@@ -23,16 +24,6 @@ import {
 } from "../utils/apis";
 import { formatIPAddress, isEmptyObject } from "../utils/format";
 
-function streamDetailsFormatter(streamDetails) {
-  return (
-    <ul className="statistics-list">
-      <li>{streamDetails.videoCodec || 'Unknown'} @ {streamDetails.videoBitrate || 'Unknown'} kbps</li>
-      <li>{streamDetails.framerate || 'Unknown'} fps</li>
-      <li>{streamDetails.width} x {streamDetails.height}</li>
-    </ul>
-  );
-}
-
 export default function Home() {
   const serverStatusData = useContext(ServerStatusContext);
   const { broadcaster, serverConfig: configData } = serverStatusData || {};
@@ -40,10 +31,10 @@ export default function Home() {
 
   const encoder = streamDetails?.encoder || "Unknown encoder";
 
-  const [logsData, setLogs] = useState([]);
+  const [logsData, setLogs] = useState([] as Log[]);
   const getLogs = async () => {
     try {
-      const result = await fetchData(LOGS_WARN);
+      const result: Log[] = await fetchData(LOGS_WARN);
       setLogs(result);
     } catch (error) {
       console.log("==== error", error);
@@ -56,7 +47,7 @@ export default function Home() {
   useEffect(() => {
     getMoreStats();
 
-    let intervalId = null;
+    let intervalId: NodeJS.Timeout = null;
     intervalId = setInterval(getMoreStats, FETCH_INTERVAL);
 
     return () => {
@@ -77,7 +68,7 @@ export default function Home() {
   if (!broadcaster) {
     return <Offline logs={logsData} />;
   }
-  
+
   // map out settings
   const videoQualitySettings = configData?.videoSettings?.videoQualityVariants?.map((setting, index) => {
     const { audioPassthrough, videoPassthrough, audioBitrate, videoBitrate, framerate } = setting;
@@ -89,10 +80,11 @@ export default function Home() {
     const videoSetting = videoPassthrough
         ? `${streamDetails.videoBitrate || 'Unknown'} kbps, ${streamDetails.framerate} fps ${streamDetails.width} x ${streamDetails.height}`
         : `${videoBitrate || 'Unknown'} kbps, ${framerate} fps`;
-    
+
     let settingTitle = 'Outbound Stream Details';
     settingTitle = (videoQualitySettings?.length > 1) ?
       `${settingTitle} ${index + 1}` : settingTitle;
+    // TODO: Implement proper keys for this Card component
     return (
       <Card title={settingTitle} type="inner" key={`${settingTitle}${index}`}>
         <StatisticItem
@@ -114,11 +106,16 @@ export default function Home() {
   const { viewerCount, sessionPeakViewerCount } = serverStatusData;
 
   const streamAudioDetailString = `${streamDetails.audioCodec}, ${streamDetails.audioBitrate || 'Unknown'} kbps`;
+  const streamVideoDetailsList = [
+    `${streamDetails.videoCodec || 'Unknown'} @ ${streamDetails.videoBitrate || 'Unknown'} kbps`,
+    `${streamDetails.framerate || 'Unknown'} fps`,
+    `${streamDetails.width} x ${streamDetails.height}`
+  ]
 
   const broadcastDate = new Date(broadcaster.time);
 
   return (
-    <div className="home-container">      
+    <div className="home-container">
       <div className="sections-container">
         <div className="section online-status-section">
           <Card title="Stream is online" type="inner">
@@ -156,11 +153,13 @@ export default function Home() {
                 value={`${encoder} ${formatIPAddress(remoteAddr)}`}
                 prefix={null}
               />
-              <StatisticItem
-                title="Inbound Video Stream"
-                value={streamDetails}
-                formatter={streamDetailsFormatter}
-                prefix={null}
+              <List
+                bordered
+                header="Inbound Video Stream"
+                dataSource={streamVideoDetailsList}
+                renderItem={item => <List.Item>&bull; {item}</List.Item>}
+                size="small"
+                split={false}
               />
               <StatisticItem
                 title="Inbound Audio Stream"

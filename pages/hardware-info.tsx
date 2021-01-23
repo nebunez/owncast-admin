@@ -2,56 +2,58 @@ import { BulbOutlined, LaptopOutlined, SaveOutlined } from "@ant-design/icons";
 import { Row } from "antd";
 import React, { useEffect, useState } from 'react';
 import { fetchData, FETCH_INTERVAL, HARDWARE_STATS } from '../utils/apis';
-import Chart from './components/chart';
+import Chart, { SeriesItem, TimedValue } from './components/chart';
 import StatisticItem from "./components/statistic";
 
-interface TimedValue {
-  time: Date,
-  value: Number
+interface HardwareStatus {
+  cpu: TimedValue[];
+  memory: TimedValue[];
+  disk: TimedValue[];
+  message: string;
 }
 
 export default function HardwareInfo() {
-  const [hardwareStatus, setHardwareStatus] = useState({
-    cpu: Array<TimedValue>(),
-    memory: Array<TimedValue>(),
-    disk: Array<TimedValue>(),
+  const initialHardwareStatus: HardwareStatus = {
+    cpu: [],
+    memory: [],
+    disk: [],
     message: "",
-  });
+  }
+  const [hardwareStatus, setHardwareStatus] = useState(initialHardwareStatus as HardwareStatus);
 
   const getHardwareStatus = async () => {
     try {
-      const result = await fetchData(HARDWARE_STATS);
+      const result: HardwareStatus = await fetchData(HARDWARE_STATS);
       setHardwareStatus({ ...result });
-
     } catch (error) {
       setHardwareStatus({ ...hardwareStatus, message: error.message });
     }
   };
-  
+
   useEffect(() => {
-    let getStatusIntervalId = null;
+    let getStatusIntervalId: NodeJS.Timeout = null;
 
     getHardwareStatus();
     getStatusIntervalId = setInterval(getHardwareStatus, FETCH_INTERVAL); // runs every 1 min.
-  
-    // returned function will be called on component unmount 
+
+    // returned function will be called on component unmount
     return () => {
       clearInterval(getStatusIntervalId);
     }
   }, []);
 
- 
+
   if (!hardwareStatus.cpu) {
     return null;
   }
 
-  const currentCPUUsage = hardwareStatus.cpu[hardwareStatus.cpu.length - 1]?.value;
+  const currentCPUUsage = hardwareStatus.cpu[hardwareStatus.cpu.length - 1]?.value || 0;
   const currentRamUsage =
-    hardwareStatus.memory[hardwareStatus.memory.length - 1]?.value;
+    hardwareStatus.memory[hardwareStatus.memory.length - 1]?.value || 0;
   const currentDiskUsage =
-    hardwareStatus.disk[hardwareStatus.disk.length - 1]?.value;
-  
-const series = [
+    hardwareStatus.disk[hardwareStatus.disk.length - 1]?.value || 0;
+
+const series: SeriesItem[] = [
   {
     name: "CPU",
     color: "#B63FFF",
@@ -68,14 +70,14 @@ const series = [
     data: hardwareStatus.disk,
   },
 ];
-  
+
     return (
       <div>
         <div>
           <Row gutter={[16, 16]} justify="space-around">
             <StatisticItem
               title={series[0].name}
-              value={`${currentCPUUsage}`}
+              value={currentCPUUsage}
               prefix={<LaptopOutlined style={{color: series[0].color }}/>}
               color={series[0].color}
               progress
@@ -83,7 +85,7 @@ const series = [
             />
             <StatisticItem
               title={series[1].name}
-              value={`${currentRamUsage}`}
+              value={currentRamUsage}
               prefix={<BulbOutlined style={{color: series[1].color }} />}
               color={series[1].color}
               progress
@@ -91,7 +93,7 @@ const series = [
             />
             <StatisticItem
               title={series[2].name}
-              value={`${currentDiskUsage}`}
+              value={currentDiskUsage}
               prefix={<SaveOutlined  style={{color: series[2].color }} />}
               color={series[2].color}
               progress

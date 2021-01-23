@@ -1,16 +1,20 @@
 import React, { useContext } from 'react';
 import { Table, Typography } from 'antd';
-import { ServerStatusContext } from '../utils/server-status-context';
+import { ColumnsType } from 'antd/es/table';
+import { VideoQualityVariant, ServerConfigState, ServerStatusContext } from '../utils/server-status-context';
 
 const { Title } = Typography;
 
+interface VideoVariantsProps {
+  config: ServerConfigState;
+}
 
-function VideoVariants({ config }) {
+function VideoVariants({ config }: VideoVariantsProps) {
   if (!config || !config.videoSettings) {
     return null;
   }
 
-  const videoQualityColumns = [
+  const videoQualityColumns: ColumnsType<VideoQualityVariant> = [
     {
       title: "#",
       dataIndex: "key",
@@ -46,7 +50,12 @@ function VideoVariants({ config }) {
     },
   ];
 
-  const miscVideoSettingsColumns = [
+  interface MiscVideoSettings {
+    name: string;
+    value: number;
+  }
+
+  const miscVideoSettingsColumns: ColumnsType<MiscVideoSettings> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -59,20 +68,18 @@ function VideoVariants({ config }) {
     },
   ];
 
-  const miscVideoSettings = [
+  const miscVideoSettings: MiscVideoSettings[] = [
     {
       name: "Segment length",
-      value: config.videoSettings.segmentLengthSeconds,
-      key: "segmentLength"
+      value: config.videoSettings.segmentLengthSeconds
     },
     {
       name: "Number of segments",
-      value: config.videoSettings.numberOfPlaylistItems,
-      key: "numberOfSegments"
+      value: config.videoSettings.numberOfPlaylistItems
     },
   ];
 
-  const videoQualityVariantData = config.videoSettings.videoQualityVariants.map(function(variant, index) {
+  const videoQualityVariantData = config.videoSettings.videoQualityVariants.map((variant, index) => {
     return {
       key: index,
       ...variant
@@ -110,4 +117,3 @@ export default function VideoConfig() {
     </div>
   ); 
 }
-

@@ -1,13 +1,24 @@
 import { Result, Card } from "antd";
 import { MessageTwoTone, QuestionCircleTwoTone, BookTwoTone, PlaySquareTwoTone } from '@ant-design/icons';
-import OwncastLogo from "./components/logo"
-import LogTable from "./components/log-table";
 import Link from 'next/link';
+import OwncastLogo from "./components/logo"
+import { Log } from "./logs";
+import LogTable from "./components/log-table";
 
 const { Meta } = Card;
 
-export default function Offline({ logs = [] }) {
-  const data = [
+interface OfflineData {
+  icon: JSX.Element;
+  title: string;
+  content: JSX.Element | string;
+}
+
+interface OfflineProps {
+  logs: Log[];
+}
+
+export default function Offline({ logs = [] }: OfflineProps) {
+  const data: OfflineData[] = [
     {
       icon: <BookTwoTone twoToneColor="#6f42c1" />,
       title: "Use your broadcasting software",
@@ -36,7 +47,7 @@ export default function Offline({ logs = [] }) {
       title: "Not sure what to do next?",
       content: (
         <div>
-          If you're having issues or would like to know how to customize and configure your Owncast server visit <Link href="/help">the help page.</Link>
+          If you&apos;re having issues or would like to know how to customize and configure your Owncast server visit <Link href="/help">the help page.</Link>
         </div>
       ),
     }

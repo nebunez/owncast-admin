@@ -24,6 +24,7 @@ module.exports = {
     "react/jsx-filename-extension": [1, { extensions: [".js", ".jsx", ".tsx"] }],
     "react/jsx-props-no-spreading": "off",
     
+    'no-undef': 'off', // typescript will pick these up
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'error',
     

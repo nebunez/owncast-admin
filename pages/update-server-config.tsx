@@ -1,19 +1,24 @@
 import React, { useContext } from 'react';
 import { Table, Typography, Input } from 'antd';
+import { ColumnsType } from 'antd/es/table';
 import { isEmptyObject } from '../utils/format';
-import KeyValueTable from "./components/key-value-table";
-import { ServerStatusContext } from '../utils/server-status-context';
+import KeyValueTable, { KeyValueTableData } from "./components/key-value-table";
+import { SocialHandle, ServerConfigState, ServerStatusContext } from '../utils/server-status-context';
 import adminStyles from '../styles/styles.module.scss';
 
 const { Title } = Typography;
 const { TextArea } = Input;
 
-function SocialHandles({ config }) {
+interface SocialHandleProps {
+  config: ServerConfigState;
+}
+
+function SocialHandles({ config }: SocialHandleProps) {
   if (!config) {
     return null;
   }
 
-  const columns = [
+  const columns: ColumnsType<SocialHandle> = [
     {
       title: "Platform",
       dataIndex: "platform",
@@ -27,7 +32,7 @@ function SocialHandles({ config }) {
     },
   ];
 
-  if (!config.instanceDetails?.socialHandles) {
+  if (!config.instanceDetails.socialHandles) {
     return null;
   }
 
@@ -44,14 +49,18 @@ function SocialHandles({ config }) {
     );
 }
 
-function InstanceDetails({ config }) {
+interface InstanceDetailsProps {
+  config: ServerConfigState;
+}
+
+function InstanceDetails({ config }: InstanceDetailsProps) {
   if (!config || isEmptyObject(config)) {
     return null;
   }
 
-  const { instanceDetails = {}, yp, streamKey, ffmpegPath, webServerPort } = config;
-  
-  const data = [
+  const { instanceDetails, yp, streamKey, ffmpegPath, webServerPort } = config;
+
+  const detailsData: KeyValueTableData[] = [
     {
       name: "Server name",
       value: instanceDetails.name,
@@ -82,7 +91,7 @@ function InstanceDetails({ config }) {
     },
   ];
 
-  const configData = [
+  const configData: KeyValueTableData[] = [
     {
       name: "Stream key",
       value: streamKey,
@@ -100,7 +109,7 @@ function InstanceDetails({ config }) {
   return (
     <>
       <div className={adminStyles.configSection}>
-        <KeyValueTable title="Server details" data={data} />
+        <KeyValueTable title="Server details" data={detailsData} />
       </div>
       <div className={adminStyles.configSection}>
         <KeyValueTable title="Server configuration" data={configData} />
@@ -109,8 +118,12 @@ function InstanceDetails({ config }) {
   );
 }
 
-function PageContent({ config }) {
-  if (!config?.instanceDetails?.extraPageContent) {
+interface PageContentProps {
+  config: ServerConfigState;
+}
+
+function PageContent({ config }: PageContentProps) {
+  if (!config.instanceDetails.extraPageContent) {
     return null;
   }
   return (

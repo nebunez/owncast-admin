@@ -2,27 +2,21 @@ import { Typography, Statistic, Card, Progress} from "antd";
 
 const { Text } = Typography;
 
-interface StatisticItemProps {
-  title?: string, 
-  value?: any,
-  prefix?: JSX.Element,
-  color?: string,
-  progress?: boolean,
-  centered?: boolean,
-  formatter?: any,
-};
-const defaultProps = {
-  title: '', 
-  value: 0,
-  prefix: null,
-  color: '',
-  progress: false,
-  centered: false,
-  formatter: null,
+interface ProgressViewProps {
+  title: string;
+  value: React.ReactText;
+  prefix: JSX.Element;
+  color?: string;
+}
+const defaultProgressViewProps = {
+  color: ''
 };
 
+function ProgressView({ title, value, prefix, color }: ProgressViewProps) {
+  if ((typeof value) !== 'number') {
+    throw new Error("ProgressView requires a value of type 'number'")
+  }
 
-function ProgressView({ title, value, prefix, color }: StatisticItemProps) {
   const endColor = value > 90 ? 'red' : color;
   const content = (
     <div>
@@ -34,19 +28,29 @@ function ProgressView({ title, value, prefix, color }: StatisticItemProps) {
   return (
     <Progress
       type="dashboard"
-      percent={value}
+      percent={value as number}
       width={120}
       strokeColor={{
         '0%': color,
         '90%': endColor,
       }}
-      format={percent => content}
+      format={() => content}
     />
   )
 }
-ProgressView.defaultProps = defaultProps;
+ProgressView.defaultProps = defaultProgressViewProps;
 
-function StatisticView({ title, value, prefix, formatter }: StatisticItemProps) {
+interface StatisticViewProps {
+  title: string;
+  value: string | number;
+  prefix: JSX.Element;
+  formatter?: any;
+}
+const defaultStatisticViewProps = {
+  formatter: null
+}
+
+function StatisticView({ title, value, prefix, formatter }: StatisticViewProps) {
   return (
     <Statistic
       title={title}
@@ -56,9 +60,25 @@ function StatisticView({ title, value, prefix, formatter }: StatisticItemProps) 
    />
   );
 }
-StatisticView.defaultProps = defaultProps;
+StatisticView.defaultProps = defaultStatisticViewProps;
 
-export default function StatisticItem(props: StatisticItemProps) {
+interface StatisticItemProps {
+  title: string, 
+  value: string | number,
+  prefix: JSX.Element,
+  color?: string,
+  formatter?: any,
+  progress?: boolean,
+  centered?: boolean
+};
+const statisticItemDefaultProps = {
+  color: '',
+  formatter: null,
+  progress: false,
+  centered: false
+}
+
+function StatisticItem(props: StatisticItemProps) {
   const { progress, centered } = props;
   const View = progress ? ProgressView : StatisticView;
 
@@ -72,4 +92,6 @@ export default function StatisticItem(props: StatisticItemProps) {
       </Card>
   );
 }
-StatisticItem.defaultProps = defaultProps;
+StatisticItem.defaultProps = statisticItemDefaultProps;
+
+export default StatisticItem;

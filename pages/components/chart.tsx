@@ -3,27 +3,37 @@ import 'chart.js';
 import format from 'date-fns/format';
 import styles from '../../styles/styles.module.scss';
 
-interface TimedValue {
-  time: Date;
+export interface TimedValue {
+  time: string;
   value: number;
 }
 
-interface ChartProps {
-  data?: TimedValue[],
-  title?: string,
-  color: string,
-  unit: string,
-  dataCollections?: any[],
+export interface SeriesItem {
+  name: string;
+  color: string;
+  data: TimedValue[]
 }
 
-function createGraphDataset(dataArray) {
-  const dataValues = {};
+interface ChartData {
+  [index: string]: number;
+}
+
+function createGraphDataset(dataArray: TimedValue[]) {
+  const dataValues: ChartData = {};
   dataArray.forEach(item => {
     const dateObject = new Date(item.time);
     const dateString = format(dateObject, 'p P');
     dataValues[dateString] = item.value;
   })
   return dataValues;
+}
+
+interface ChartProps {
+  data?: TimedValue[],
+  dataCollections?: SeriesItem[],
+  title: string,
+  color: string,
+  unit: string,
 }
 
 export default function Chart({ data, title, color, unit, dataCollections }: ChartProps) {
@@ -38,9 +48,11 @@ export default function Chart({ data, title, color, unit, dataCollections }: Cha
   }
 
   dataCollections.forEach(collection => {
-    renderData.push(
-      {name: collection.name, data: createGraphDataset(collection.data), color: collection.color}
-    )
+    renderData.push({
+        name: collection.name,
+        color: collection.color,
+        data: createGraphDataset(collection.data)
+      })
   });
 
   return (
@@ -59,7 +71,6 @@ export default function Chart({ data, title, color, unit, dataCollections }: Cha
 }
 
 Chart.defaultProps = {
-  dataCollections: [],
   data: [],
-  title: '',
+  dataCollections: []
 };

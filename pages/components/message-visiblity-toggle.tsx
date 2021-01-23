@@ -2,32 +2,35 @@
 import React, { useState, useEffect } from "react";
 import { Button, Tooltip } from "antd";
 import { EyeOutlined, EyeInvisibleOutlined, CheckCircleFilled, ExclamationCircleFilled } from "@ant-design/icons";
-import { fetchData, UPDATE_CHAT_MESSGAE_VIZ } from "../../utils/apis";
-import { MessageType } from '../../types/chat';
-import { OUTCOME_TIMEOUT } from "../chat";
+import {
+  PostData,
+  ChatMessageVizResponse,
+  fetchData,
+  UPDATE_CHAT_MESSGAE_VIZ
+} from "../../utils/apis";
+import { Message, OUTCOME_TIMEOUT } from "../chat";
 import { isEmptyObject } from "../../utils/format";
 
 interface MessageToggleProps {
   isVisible: boolean;
-  message: MessageType;
-  setMessage: (message: MessageType) => void,
+  message: Message;
+  setMessage: (message: Message) => void,
 };
-
 
 export default function MessageVisiblityToggle({ isVisible, message, setMessage }: MessageToggleProps) {
   if (!message || isEmptyObject(message)) {
     return null;
   }
 
-  let outcomeTimeout = null;
+  let outcomeTimeout: NodeJS.Timeout = null;
   const [outcome, setOutcome] = useState(0);
 
-  const { id: messageId } = message || {};
+  const { id: messageId } = message;
 
   const resetOutcome = () => {
     outcomeTimeout = setTimeout(() => { setOutcome(0)}, OUTCOME_TIMEOUT);
   };
-  
+
   useEffect(() => {
     return () => {
       clearTimeout(outcomeTimeout);
@@ -38,14 +41,17 @@ export default function MessageVisiblityToggle({ isVisible, message, setMessage 
   const updateChatMessage = async () => {
     clearTimeout(outcomeTimeout);
     setOutcome(0);
-    const result = await fetchData(UPDATE_CHAT_MESSGAE_VIZ, {
+
+    const postData: PostData = {
       auth: true,
       method: 'POST',
       data: {
         visible: !isVisible,
         idArray: [messageId],
-      },
-    });
+      }
+    };
+
+    const result: ChatMessageVizResponse = await fetchData(UPDATE_CHAT_MESSGAE_VIZ, postData);
 
     if (result.success && result.message === "changed") {
       setMessage({ ...message, visible: !isVisible });
