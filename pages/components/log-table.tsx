@@ -4,7 +4,8 @@ import { ColumnsType } from "antd/es/table";
 import Linkify from "react-linkify";
 import { SortOrder } from "antd/lib/table/interface";
 import format from 'date-fns/format'
-import { Log } from '../logs';
+
+import { Log } from '../../types';
 
 const { Title } = Typography;
 

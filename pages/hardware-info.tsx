@@ -2,8 +2,10 @@ import { BulbOutlined, LaptopOutlined, SaveOutlined } from "@ant-design/icons";
 import { Row } from "antd";
 import React, { useEffect, useState } from 'react';
 import { fetchData, FETCH_INTERVAL, HARDWARE_STATS } from '../utils/apis';
-import Chart, { SeriesItem, TimedValue } from './components/chart';
+import Chart, { SeriesItem } from './components/chart';
 import StatisticItem from "./components/statistic";
+
+import { TimedValue } from '../types';
 
 interface HardwareStatus {
   cpu: TimedValue[];

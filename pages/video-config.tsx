@@ -1,7 +1,9 @@
 import React, { useContext } from 'react';
 import { Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { VideoQualityVariant, ServerConfigState, ServerStatusContext } from '../utils/server-status-context';
+import { ServerStatusContext } from '../utils/server-status-context';
+
+import { VideoQualityVariant, ServerConfigState } from '../types';
 
 const { Title } = Typography;
 

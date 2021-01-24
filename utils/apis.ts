@@ -38,24 +38,10 @@ export const LOGS_WARN = `${API_LOCATION}logs/warnings`;
 export const CHAT_HISTORY = `${API_LOCATION}chat/messages`;
 
 // Update chat visibility
-export interface ChatMessageVizData {
-  visible: boolean;
-  idArray: string[];
-}
-export interface ChatMessageVizResponse {
-  message: string;
-  success: boolean;
-}
 export const UPDATE_CHAT_MESSGAE_VIZ = `${NEXT_PUBLIC_API_HOST}api/admin/chat/updatemessagevisibility`;
 
 
 const GITHUB_RELEASE_URL = "https://api.github.com/repos/owncast/owncast/releases/latest";
-
-export interface PostData {
-  auth: boolean;
-  method: string;
-  data: ChatMessageVizData;
-}
 
 interface FetchOptions {
   data?: object;

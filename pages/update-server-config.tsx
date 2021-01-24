@@ -2,9 +2,11 @@ import React, { useContext } from 'react';
 import { Table, Typography, Input } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { isEmptyObject } from '../utils/format';
-import KeyValueTable, { KeyValueTableData } from "./components/key-value-table";
-import { SocialHandle, ServerConfigState, ServerStatusContext } from '../utils/server-status-context';
+import KeyValueTable from "./components/key-value-table";
+import { ServerStatusContext } from '../utils/server-status-context';
 import adminStyles from '../styles/styles.module.scss';
+
+import { KeyValueTableData, SocialHandle, ServerConfigState } from '../types';
 
 const { Title } = Typography;
 const { TextArea } = Input;

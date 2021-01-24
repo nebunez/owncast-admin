@@ -6,13 +6,9 @@ import {
   fetchData,
 } from "../utils/apis";
 
-const FETCH_INTERVAL = 5 * 1000; // 5 sec
+import { Log } from '../types';
 
-export interface Log {
-  message: string;
-  level: string;
-  time: string;
-}
+const FETCH_INTERVAL = 5 * 1000; // 5 sec
 
 export default function Logs() {
   const [logs, setLogs] = useState([] as Log[]);

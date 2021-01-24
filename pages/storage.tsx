@@ -1,8 +1,10 @@
 import React, { useContext } from "react";
 import { Typography } from 'antd';
 import Link from 'next/link';
-import KeyValueTable, { KeyValueTableData } from "./components/key-value-table";
-import { ServerConfigState, ServerStatusContext } from '../utils/server-status-context';
+import KeyValueTable from "./components/key-value-table";
+import { ServerStatusContext } from '../utils/server-status-context';
+
+import { KeyValueTableData, ServerConfigState } from '../types';
 
 const { Title } = Typography;
 

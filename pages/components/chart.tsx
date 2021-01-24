@@ -3,10 +3,7 @@ import 'chart.js';
 import format from 'date-fns/format';
 import styles from '../../styles/styles.module.scss';
 
-export interface TimedValue {
-  time: string;
-  value: number;
-}
+import { TimedValue } from '../../types';
 
 export interface SeriesItem {
   name: string;

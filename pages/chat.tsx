@@ -6,10 +6,9 @@ import { ColumnsType } from 'antd/es/table';
 import { ColumnFilterItem } from 'antd/es/table/interface';
 import format from 'date-fns/format'
 
+import { ChatMessageVizData, ChatMessageVizResponse, PostData } from '../types';
+
 import {
-  ChatMessageVizData,
-  ChatMessageVizResponse,
-  PostData,
   CHAT_HISTORY,
   FETCH_INTERVAL,
   UPDATE_CHAT_MESSGAE_VIZ,

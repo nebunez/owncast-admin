@@ -4,10 +4,12 @@ import { formatDistanceToNow } from "date-fns";
 import { UserOutlined} from "@ant-design/icons";
 import { SortOrder } from "antd/lib/table/interface";
 import { ColumnsType } from "antd/es/table";
-import Chart, { TimedValue } from "./components/chart";
+import Chart from "./components/chart";
 import StatisticItem from "./components/statistic";
 
 import { ServerStatusContext } from '../utils/server-status-context';
+
+import { TimedValue } from '../types';
 
 import {
   CONNECTED_CLIENTS,

@@ -2,8 +2,9 @@ import { Result, Card } from "antd";
 import { MessageTwoTone, QuestionCircleTwoTone, BookTwoTone, PlaySquareTwoTone } from '@ant-design/icons';
 import Link from 'next/link';
 import OwncastLogo from "./components/logo"
-import { Log } from "./logs";
 import LogTable from "./components/log-table";
+
+import { Log } from "../types";
 
 const { Meta } = Card;
 

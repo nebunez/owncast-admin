@@ -15,7 +15,7 @@ import { ServerStatusContext } from "../utils/server-status-context";
 import StatisticItem from "./components/statistic"
 import LogTable from "./components/log-table";
 import Offline from './offline-notice';
-import { Log } from './logs';
+import { Log } from '../types';
 
 import {
   LOGS_WARN,

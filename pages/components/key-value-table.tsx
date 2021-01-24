@@ -1,11 +1,8 @@
 import { Table, Typography } from "antd";
 
-const { Title } = Typography;
+import { KeyValueTableData } from '../../types';
 
-export interface KeyValueTableData {
-  name: string;
-  value: string | number;
-}
+const { Title } = Typography;
 
 interface KeyValueTableProps {
   title: string, 

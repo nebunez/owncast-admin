@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 
 import { STATUS, fetchData, FETCH_INTERVAL, SERVER_CONFIG } from './apis';
 
-export interface StreamDetails {
+import { ServerConfigState } from '../types';
+
+interface StreamDetails {
   videoCodec: string;
   videoBitrate: number;
   audioCodec: String;
@@ -18,65 +20,6 @@ interface Broadcaster {
   remoteAddr: string;
   time: string;
   streamDetails: StreamDetails;
-}
-
-export interface SocialHandle {
-  platform: string;
-  url: string;
-}
-
-interface InstanceDetails {
-  name: string;
-  title: string;
-  summary: string;
-  logo: string;
-  tags?: string[];
-  version: string;
-  nsfw: boolean;
-  socialHandles?: SocialHandle[];
-  extraPageContent?: string;
-}
-
-interface S3 {
-  enabled: boolean;
-  endpoint?: string;
-  servingEndpoint?: string;
-  accessKey?: string;
-  secret?: string;
-  bucket?: string;
-  region?: string;
-  acl?: string;
-}
-
-export interface VideoQualityVariant {
-  audioPassthrough: boolean;
-  videoPassthrough: boolean;
-  videoBitrate: number;
-  audioBitrate: number;
-  framerate: number;
-  encoderPreset: string;
-}
-
-export interface VideoSettings {
-  videoQualityVariants: VideoQualityVariant[];
-  segmentLengthSeconds: number;
-  numberOfPlaylistItems: number;
-}
-
-interface YP {
-  enabled: boolean;
-  instanceURL?: string;
-}
-
-export interface ServerConfigState {
-  instanceDetails: InstanceDetails;
-  ffmpegPath: string;
-  streamKey: string;
-  webServerPort: number;
-  rtmpServerPort: number;
-  s3: S3;
-  videoSettings: VideoSettings;
-  yp: YP;
 }
 
 interface ServerStatusState {

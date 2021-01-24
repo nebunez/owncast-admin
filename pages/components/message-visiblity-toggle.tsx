@@ -2,14 +2,11 @@
 import React, { useState, useEffect } from "react";
 import { Button, Tooltip } from "antd";
 import { EyeOutlined, EyeInvisibleOutlined, CheckCircleFilled, ExclamationCircleFilled } from "@ant-design/icons";
-import {
-  PostData,
-  ChatMessageVizResponse,
-  fetchData,
-  UPDATE_CHAT_MESSGAE_VIZ
-} from "../../utils/apis";
+import { fetchData, UPDATE_CHAT_MESSGAE_VIZ } from "../../utils/apis";
 import { Message, OUTCOME_TIMEOUT } from "../chat";
 import { isEmptyObject } from "../../utils/format";
+
+import { ChatMessageVizResponse, PostData } from '../../types';
 
 interface MessageToggleProps {
   isVisible: boolean;
